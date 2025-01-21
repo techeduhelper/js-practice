@@ -187,25 +187,25 @@ const QuestionList = () => {
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">Questions Solved</Typography>
                 <Typography variant="h4">
-                  {progress.solved.length} / {questions.length}
+                  {Object.keys(progress?.scores || {}).length} / {questions.length}
                 </Typography>
               </Box>
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">Total Score</Typography>
                 <Typography variant="h4">
-                  {Object.values(progress.scores).reduce((a, b) => a + b, 0)}
+                  {Object.values(progress?.scores || {}).reduce((a, b) => a + b, 0)}
                 </Typography>
               </Box>
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">Time Spent</Typography>
                 <Typography variant="h4">
-                  {formatTime(Object.values(progress.timeSpent).reduce((a, b) => a + b, 0))}
+                  {formatTime(Object.values(progress?.times || {}).reduce((a, b) => a + b, 0))}
                 </Typography>
               </Box>
             </Box>
             <LinearProgress
               variant="determinate"
-              value={(progress.solved.length / questions.length) * 100}
+              value={(Object.keys(progress?.scores || {}).length / questions.length) * 100}
               sx={{ height: 10, borderRadius: 5 }}
             />
           </Paper>
@@ -285,8 +285,8 @@ const QuestionList = () => {
         pt: 2,
       }}>
         <Grid container spacing={3}>
-          {filteredQuestions.map((question) => (
-            <Grid item xs={12} sm={6} md={4} key={question.id}>
+          {filteredQuestions.map((question, index) => (
+            <Grid item xs={12} sm={6} md={4} key={`question-${question.id}-${index}`}>
               <Card
                 sx={{
                   height: '100%',
@@ -343,17 +343,17 @@ const QuestionList = () => {
                   </Box>
                   {progress && (
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                      {progress.timeSpent[question.id] && (
+                      {progress?.times && progress.times[question.id] && (
                         <Tooltip title="Time Spent">
                           <Chip
                             icon={<TimerIcon />}
-                            label={formatTime(progress.timeSpent[question.id])}
+                            label={formatTime(progress.times[question.id])}
                             size="small"
                             variant="outlined"
                           />
                         </Tooltip>
                       )}
-                      {progress.scores[question.id] && (
+                      {progress?.scores && progress.scores[question.id] && (
                         <Tooltip title="Your Score">
                           <Chip
                             icon={<CheckCircleIcon />}
