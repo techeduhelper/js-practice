@@ -69,7 +69,7 @@ const QuestionList = () => {
     if (selectedTopic === 'all') {
       return baseFilteredQuestions;
     }
-    return baseFilteredQuestions.filter(q => q.topics.includes(selectedTopic));
+    return baseFilteredQuestions.filter(q => Array.isArray(q.topics) && q.topics.includes(selectedTopic));
   }, [baseFilteredQuestions, selectedTopic]);
 
   const getDifficultyColor = (difficulty) => {
@@ -88,9 +88,11 @@ const QuestionList = () => {
     };
 
     questions.forEach(question => {
-      question.topics.forEach(topic => {
-        counts[topic] = (counts[topic] || 0) + 1;
-      });
+      if (Array.isArray(question.topics)) {
+        question.topics.forEach(topic => {
+          counts[topic] = (counts[topic] || 0) + 1;
+        });
+      }
     });
 
     return counts;
