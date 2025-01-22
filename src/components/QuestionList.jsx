@@ -54,22 +54,31 @@ const QuestionList = () => {
 
   // Calculate all questions that match the search term and difficulty
   const baseFilteredQuestions = React.useMemo(() => {
+    if (!Array.isArray(questions)) return [];
+    
     return questions.filter(q => {
-      const matchesSearch = !searchTerm ||
-        q.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        q.description.toLowerCase().includes(searchTerm.toLowerCase());
+      if (!q || typeof q !== 'object') return false;
+      
+      const matchesSearch = !searchTerm || (
+        (q.title?.toLowerCase()?.includes(searchTerm.toLowerCase()) || false) ||
+        (q.description?.toLowerCase()?.includes(searchTerm.toLowerCase()) || false)
+      );
       const matchesDifficulty = difficulty === 'all' ||
-        q.difficulty.toLowerCase() === difficulty.toLowerCase();
+        (q.difficulty?.toLowerCase() === difficulty.toLowerCase());
       return matchesSearch && matchesDifficulty;
     });
   }, [searchTerm, difficulty]);
 
   // Further filter based on selected topic
   const filteredQuestions = React.useMemo(() => {
+    if (!Array.isArray(baseFilteredQuestions)) return [];
+    
     if (selectedTopic === 'all') {
       return baseFilteredQuestions;
     }
-    return baseFilteredQuestions.filter(q => Array.isArray(q.topics) && q.topics.includes(selectedTopic));
+    return baseFilteredQuestions.filter(q => 
+      q && q.topics && Array.isArray(q.topics) && q.topics.includes(selectedTopic)
+    );
   }, [baseFilteredQuestions, selectedTopic]);
 
   const getDifficultyColor = (difficulty) => {
@@ -177,13 +186,13 @@ const QuestionList = () => {
         flexDirection: 'column',
       }}
     >
-      <Box sx={{ p: 3, borderBottom: 1, borderColor: 'divider' }}>
+      <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
         <Typography variant="h3" gutterBottom>
           JavaScript Practice Questions
         </Typography>
 
         {progress && (
-          <Paper sx={{ p: 2, mb: 2 }}>
+          <Paper sx={{ p: 2, mb: 1 }}>
             <Typography variant="h6" gutterBottom>Your Progress</Typography>
             <Box sx={{ display: 'flex', gap: 3, mb: 2 }}>
               <Box>
@@ -212,8 +221,8 @@ const QuestionList = () => {
             />
           </Paper>
         )}
-        <Paper sx={{ p: 2, mb: 2 }}>
-          <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
+        <Paper sx={{ p: 2, mb: 1 }}>
+          <Box sx={{display: 'flex', gap: 2, alignItems: 'center' }}>
             <TextField
               fullWidth
               variant="outlined"
@@ -256,13 +265,13 @@ const QuestionList = () => {
           </Box>
         </Paper>
 
-        <Paper sx={{ mb: 2 }}>
+        <Paper sx={{ }}>
           <Tabs
             value={selectedTopic}
             onChange={handleTopicChange}
             variant="scrollable"
             scrollButtons="auto"
-            sx={{ borderBottom: 1, borderColor: 'divider' }}
+            sx={{ borderColor: 'divider' }}
           >
             <Tab
               label={`All (${questionsByTopic.all})`}
@@ -288,7 +297,7 @@ const QuestionList = () => {
       }}>
         <Grid container spacing={3}>
           {filteredQuestions.map((question, index) => (
-            <Grid item xs={12} sm={6} md={4} key={`question-${question.id}-${index}`}>
+            <Grid item xs={12} sm={6} md={4} key={question?.id || index}>
               <Card
                 sx={{
                   height: '100%',
@@ -299,10 +308,10 @@ const QuestionList = () => {
                     boxShadow: (theme) => theme.shadows[4]
                   }
                 }}
-                onClick={() => navigate(`/question/${question.id}`)}
+                onClick={() => question?.id && navigate(`/question/${question.id}`)}
               >
                 <CardContent>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Typography variant="h6" component="div">
                         {question.id}. {question.title}
